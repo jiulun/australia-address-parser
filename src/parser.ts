@@ -446,22 +446,23 @@ const StreetType = {
 };
 
 const StateCode = {
-  "New South Wales": "NSW",
-  "Northern Territory	": "NT",
-  "Queensland": "QLD",
-  "South Australia": "SA",
-  "Tasmania": "TAS",
-  "Victoria": "VIC",
-  "Western Australia": "WA"
+  'Australian Capital Territory': 'ACT',
+  'New South Wales': 'NSW',
+  'Northern Territory	': 'NT',
+  Queensland: 'QLD',
+  'South Australia': 'SA',
+  Tasmania: 'TAS',
+  Victoria: 'VIC',
+  'Western Australia': 'WA'
 };
 
-const DirectionCode = {}
+const DirectionCode = {};
 
 const normalizeMap = {
   type: StreetType,
   type1: StreetType,
   type2: StreetType,
-  state: StateCode,
+  state: StateCode
 };
 
 export interface Address {
@@ -517,7 +518,6 @@ interface AddressRegex {
 type AddressParts = RegExpExecArray;
 
 export class Parser {
-
   private initialized = false;
   private addressRegex: AddressRegex;
 
@@ -530,7 +530,8 @@ export class Parser {
     for (let i = 0; i < splitStr.length; i++) {
       // You do not need to check if 'i' is larger than splitStr length, as your for does that for you
       // Assign it back to the array
-      splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);
+      splitStr[i] =
+        splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);
     }
     // Directly return the joined string
     return splitStr.join(' ');
@@ -553,39 +554,67 @@ export class Parser {
     this.initialized = true;
 
     this.addressRegex = {
-      type: this.flatten(StreetType).sort().filter(function (v, i, arr) {
-        return arr.indexOf(v) === i
-      }).join('|'),
+      type: this.flatten(StreetType)
+        .sort()
+        .filter(function (v, i, arr) {
+          return arr.indexOf(v) === i;
+        })
+        .join('|'),
       fraction: '\\d+\\/\\d+',
-      state: '\\b(?:' + Object.keys(StateCode).concat(Object.values(StateCode)).map(XRegExp.escape).join('|') + ')\\b',
+      state:
+        '\\b(?:' +
+        Object.keys(StateCode)
+          .concat(Object.values(StateCode))
+          .map(XRegExp.escape)
+          .join('|') +
+        ')\\b',
       postcode: '(?<postcode>\\d{4})[- ]?(?<plus4>\\d{4})?',
-      corner: '(?:\\band\\b|\\bat\\b|&|\\@)',
+      corner: '(?:\\band\\b|\\bat\\b|&|\\@)'
     };
 
-    this.addressRegex.streetNameNumber = '(?<streetNumber>\\d+-?\\d*)(?=\\D)';
+    this.addressRegex.streetNameNumber =
+      '(?<streetNumber>\\d+[a-zA-Z]?-?\\d*)(?=\\s)';
 
-    this.addressRegex.streetName = '                                       \n\
+    this.addressRegex.streetName =
+      '                                       \n\
       (?:                                                       \n\
-        (?:(?<streetName_0>' + this.addressRegex.direct + ')\\W+               \n\
-           (?<streetType_0>' + this.addressRegex.type + ')\\b                    \n\
+        (?:(?<streetName_0>' +
+      this.addressRegex.direct +
+      ')\\W+               \n\
+           (?<streetType_0>' +
+      this.addressRegex.type +
+      ')\\b                    \n\
         )                                                       \n\
         |                                                       \n\
-        (?:(?<prefix_0>' + this.addressRegex.direct + ')\\W+)?               \n\
+        (?:(?<prefix_0>' +
+      this.addressRegex.direct +
+      ')\\W+)?               \n\
         (?:                                                     \n\
           (?<streetName_1>[^,]*\\d)                                 \n\
-          (?:[^\\w,]*(?<suffix_1>' + this.addressRegex.direct + ')\\b)     \n\
+          (?:[^\\w,]*(?<suffix_1>' +
+      this.addressRegex.direct +
+      ')\\b)     \n\
           |                                                     \n\
           (?<streetName_2>[^,]+)                                    \n\
-          (?:[^\\w,]+(?<streetType_2>' + this.addressRegex.type + ')\\b)         \n\
-          (?:[^\\w,]+(?<suffix_2>' + this.addressRegex.direct + ')\\b)?    \n\
+          (?:[^\\w,]+(?<streetType_2>' +
+      this.addressRegex.type +
+      ')\\b)         \n\
+          (?:[^\\w,]+(?<suffix_2>' +
+      this.addressRegex.direct +
+      ')\\b)?    \n\
           |                                                     \n\
           (?<street_3>[^,]+?)                                   \n\
-          (?:[^\\w,]+(?<streetType_3>' + this.addressRegex.type + ')\\b)?        \n\
-          (?:[^\\w,]+(?<suffix_3>' + this.addressRegex.direct + ')\\b)?    \n\
+          (?:[^\\w,]+(?<streetType_3>' +
+      this.addressRegex.type +
+      ')\\b)?        \n\
+          (?:[^\\w,]+(?<suffix_3>' +
+      this.addressRegex.direct +
+      ')\\b)?    \n\
         )                                                       \n\
       )';
 
-    this.addressRegex.unitTypeNumbered = '             \n\
+    this.addressRegex.unitTypeNumbered =
+      '             \n\
       (?<unitType_1>su?i?te                      \n\
         |p\\W*[om]\\W*b(?:ox)?                        \n\
         |(?:ap|dep)(?:ar)?t(?:me?nt)?                 \n\
@@ -605,7 +634,8 @@ export class Parser {
       )                                               \n\
       ';
 
-    this.addressRegex.unitTypeUnNumbered = '           \n\
+    this.addressRegex.unitTypeUnNumbered =
+      '           \n\
       (?<unitType_2>ba?se?me?n?t                 \n\
         |fro?nt                                       \n\
         |lo?bby                                       \n\
@@ -617,73 +647,129 @@ export class Parser {
         |uppe?r                                       \n\
       )\\b';
 
-    this.addressRegex.unitSection = '                               \n\
+    this.addressRegex.unitSection =
+      '                               \n\
       (?:                               #fix3             \n\
         (?:                             #fix1             \n\
           (?:                                             \n\
-            (?:' + this.addressRegex.unitTypeNumbered + '\\W*) \n\
+            (?:' +
+      this.addressRegex.unitTypeNumbered +
+      '\\W*) \n\
             |(?<unitType_3>\\#)\\W*                  \n\
           )                                               \n\
           (?<unitNumber_1>[\\w-]+)                      \n\
         )                                                 \n\
         |                                                 \n\
-        ' + this.addressRegex.unitTypeUnNumbered + '           \n\
+        ' +
+      this.addressRegex.unitTypeUnNumbered +
+      '           \n\
       )';
 
-    this.addressRegex.suburbAndState = '                       \n\
+    this.addressRegex.suburbAndState =
+      '                       \n\
       (?:                                               \n\
         (?<suburb>[^\\d,]+?)\\W+                          \n\
-        (?<state>' + this.addressRegex.state + ')                  \n\
+        (?<state>' +
+      this.addressRegex.state +
+      ')                  \n\
       )                                                 \n\
       ';
 
-    this.addressRegex.place = '                                \n\
-      (?:' + this.addressRegex.suburbAndState + '\\W*)?            \n\
-      (?:' + this.addressRegex.postcode + ')?                           \n\
+    this.addressRegex.place =
+      '                                \n\
+      (?:' +
+      this.addressRegex.suburbAndState +
+      '\\W*)?            \n\
+      (?:' +
+      this.addressRegex.postcode +
+      ')?                           \n\
       ';
 
-    this.addressRegex.address = XRegExp('                      \n\
+    this.addressRegex.address = XRegExp(
+      '                      \n\
       ^                                                 \n\
       [^\\w\\#]*                                        \n\
-      (' + this.addressRegex.streetNameNumber + ')\\W*                       \n\
-      (?:' + this.addressRegex.fraction + '\\W*)?                  \n\
-         ' + this.addressRegex.streetName + '\\W+                      \n\
-      (?:' + this.addressRegex.unitSection + ')?\\W*          #fix2   \n\
-         ' + this.addressRegex.place + '                           \n\
-      \\W*$', 'ix');
+      (' +
+      this.addressRegex.streetNameNumber +
+      ')\\W*                       \n\
+      (?:' +
+      this.addressRegex.fraction +
+      '\\W*)?                  \n\
+         ' +
+      this.addressRegex.streetName +
+      '\\W+                      \n\
+      (?:' +
+      this.addressRegex.unitSection +
+      ')?\\W*          #fix2   \n\
+         ' +
+      this.addressRegex.place +
+      '                           \n\
+      \\W*$',
+      'ix'
+    );
 
     const sep = '(?:\\W+|$)'; // no support for \Z
 
-    this.addressRegex.informalAddress = XRegExp('                   \n\
+    this.addressRegex.informalAddress = XRegExp(
+      '                   \n\
       ^                                                       \n\
       \\s*                                                    \n\
-      (?:' + this.addressRegex.unitSection + sep + ')?                        \n\
-      (?:' + this.addressRegex.streetNameNumber + ')?\\W*                          \n\
-      (?:' + this.addressRegex.fraction + '\\W*)?                        \n\
-         ' + this.addressRegex.streetName + sep + '                            \n\
-      (?:' + this.addressRegex.unitSection.replace(/_\d/g, '$&1') + sep + ')?  \n\
-      (?:' + this.addressRegex.place + ')?                               \n\
-      ', 'ix');
+      (?:' +
+      this.addressRegex.unitSection +
+      sep +
+      ')?                        \n\
+      (?:' +
+      this.addressRegex.streetNameNumber +
+      ')?\\W*                          \n\
+      (?:' +
+      this.addressRegex.fraction +
+      '\\W*)?                        \n\
+         ' +
+      this.addressRegex.streetName +
+      sep +
+      '                            \n\
+      (?:' +
+      this.addressRegex.unitSection.replace(/_\d/g, '$&1') +
+      sep +
+      ')?  \n\
+      (?:' +
+      this.addressRegex.place +
+      ')?                               \n\
+      ',
+      'ix'
+    );
 
-    this.addressRegex.intersection = XRegExp('                     \n\
+    this.addressRegex.intersection = XRegExp(
+      '                     \n\
       ^\\W*                                                 \n\
-      ' + this.addressRegex.streetName.replace(/_\d/g, '1$&') + '\\W*?      \n\
-      \\s+' + this.addressRegex.corner + '\\s+                         \n\
-      ' + this.addressRegex.streetName.replace(/_\d/g, '2$&') + '\\W+     \n\
-      ' + this.addressRegex.place + '\\W*$', 'ix');
+      ' +
+      this.addressRegex.streetName.replace(/_\d/g, '1$&') +
+      '\\W*?      \n\
+      \\s+' +
+      this.addressRegex.corner +
+      '\\s+                         \n\
+      ' +
+      this.addressRegex.streetName.replace(/_\d/g, '2$&') +
+      '\\W+     \n\
+      ' +
+      this.addressRegex.place +
+      '\\W*$',
+      'ix'
+    );
   }
 
   private optimiseAddress(address: string): string {
     const leadingCharacter = address[0];
     let optimisedAddress = address;
     if (!isNaN(+leadingCharacter)) {
-      const unitMatchedParts = address.match(/(\d+)([a-zA-Z]?)/);
-      const [unitPart, _unitNumber, unitCharacter] = unitMatchedParts;
+      const unitMatchedParts = address.match(/(\d+)(\/?)(\d+)?/);
+      const [_unitPart, _unitNumber, unitCharacter, _streetNumber] =
+        unitMatchedParts;
       if (unitCharacter) {
-        optimisedAddress = 'unit ' + unitPart + ' ' + address.substring(address.indexOf(' ') + 1);
+        optimisedAddress = 'unit ' + address;
       }
     }
-    return optimisedAddress.replace(/\s*\([^)]*\)/g, "").replace(/\s-\s/g, "-");
+    return optimisedAddress.replace(/\s*\([^)]*\)/g, '').replace(/\s-\s/g, '-');
   }
 
   private shortenStreetType(streetType: string): string {
@@ -710,7 +796,10 @@ export class Parser {
     if (XRegExp(this.addressRegex.corner, 'xi').test(optimisedAddress)) {
       return this.parseIntersection(optimisedAddress);
     }
-    return this.parseAddress(optimisedAddress) || this.parseInformalAddress(optimisedAddress);
+    return (
+      this.parseAddress(optimisedAddress) ||
+      this.parseInformalAddress(optimisedAddress)
+    );
   }
 
   normalizeAddress(parts: AddressParts): Address | null {
@@ -720,9 +809,10 @@ export class Parser {
     }
     const parsed: Address = {};
     Object.keys(parts).forEach(function (k) {
-      if (['input', 'index'].indexOf(k) !== -1 || isFinite(+k))
-        return;
-      const key = isFinite(+(k.split('_').pop())) ? k.split('_').slice(0, -1).join('_') : k;
+      if (['input', 'index'].indexOf(k) !== -1 || isFinite(+k)) return;
+      const key = isFinite(+k.split('_').pop())
+        ? k.split('_').slice(0, -1).join('_')
+        : k;
       if (parts[k])
         parsed[key] = parts[k].trim().replace(/^\s+|\s+$|[^\w\s\-#&]/g, '');
     });
@@ -734,50 +824,86 @@ export class Parser {
 
     ['type', 'type1', 'type2'].forEach(function (key) {
       if (key in parsed)
-        parsed[key] = parsed[key].charAt(0).toUpperCase() + parsed[key].slice(1).toLowerCase();
+        parsed[key] =
+          parsed[key].charAt(0).toUpperCase() +
+          parsed[key].slice(1).toLowerCase();
     });
 
     // Handle post box address
-    if (typeof parsed.unitType !== "undefined") {
+    if (typeof parsed.unitType !== 'undefined') {
       if (parsed.unitType.replace(/\s/g, '').toLowerCase() == 'pobox') {
-        parts.input = parts.input.replace(/\./g, "");
-        const suburbAndState = 'street' + parts.input.replace(parsed.unitType, '').replace(parsed.unitNumber, '');
+        parts.input = parts.input.replace(/\./g, '');
+        const suburbAndState =
+          'street' +
+          parts.input
+            .replace(parsed.unitType, '')
+            .replace(parsed.unitNumber, '');
         const postBoxLocation = this.parseLocation(suburbAndState);
         delete postBoxLocation.streetNumber;
         delete postBoxLocation.street;
-        postBoxLocation.propertyName = parsed.unitType + ' ' + parsed.unitNumber;
+        postBoxLocation.propertyName =
+          parsed.unitType + ' ' + parsed.unitNumber;
         return postBoxLocation;
       }
     }
 
-    if (typeof parsed.streetType !== "undefined") parsed.streetType = this.shortenStreetType(parsed.streetType);
-    if (typeof parsed.streetType1 !== "undefined") parsed.streetType1 = this.shortenStreetType(parsed.streetType1);
-    if (typeof parsed.streetType2 !== "undefined") parsed.streetType2 = this.shortenStreetType(parsed.streetType2);
+    if (typeof parsed.streetType !== 'undefined')
+      parsed.streetType = this.shortenStreetType(parsed.streetType);
+    if (typeof parsed.streetType1 !== 'undefined')
+      parsed.streetType1 = this.shortenStreetType(parsed.streetType1);
+    if (typeof parsed.streetType2 !== 'undefined')
+      parsed.streetType2 = this.shortenStreetType(parsed.streetType2);
 
     // Handle Intersection
-    if (typeof parsed.streetName1 !== "undefined" || typeof parsed.streetName2 !== "undefined" || typeof parsed.streetType1 !== "undefined" || typeof parsed.streetType2 !== "undefined") {
-
-      if (typeof parsed.streetType1 == "undefined" && typeof parsed.streetType2 !== "undefined") {
+    if (
+      typeof parsed.streetName1 !== 'undefined' ||
+      typeof parsed.streetName2 !== 'undefined' ||
+      typeof parsed.streetType1 !== 'undefined' ||
+      typeof parsed.streetType2 !== 'undefined'
+    ) {
+      if (
+        typeof parsed.streetType1 == 'undefined' &&
+        typeof parsed.streetType2 !== 'undefined'
+      ) {
         parsed.streetType1 = parsed.streetType2;
-        if (typeof parsed.streetName1 == "undefined" && typeof parsed.street1 !== "undefined") {
+        if (
+          typeof parsed.streetName1 == 'undefined' &&
+          typeof parsed.street1 !== 'undefined'
+        ) {
           parsed.streetName1 = parsed.street1;
-          delete (parsed.street1)
+          delete parsed.street1;
         }
       }
-      parsed.streetName1 = parsed.streetName1.replace(/^(Crn|Cnr of|Cnr|Corner)/g, "");
-      parsed.streetName = parsed.streetName1 + ' ' + parsed.streetType1 + ' & ' + parsed.streetName2 + ' ' + parsed.streetType2;
+      parsed.streetName1 = parsed.streetName1.replace(
+        /^(Crn|Cnr of|Cnr|Corner)/g,
+        ''
+      );
+      parsed.streetName =
+        parsed.streetName1 +
+        ' ' +
+        parsed.streetType1 +
+        ' & ' +
+        parsed.streetName2 +
+        ' ' +
+        parsed.streetType2;
     }
 
     if (parsed.suburb) {
       parsed.suburb = this.applyTitleCase(parsed.suburb);
-      parsed.suburb = XRegExp.replace(parsed.suburb,
-        XRegExp('^(?<dircode>' + this.addressRegex.dircode + ')\\s+(?=\\S)', 'ix'),
-        (match: any) => this.capitalize(DirectionCode[match.dircode.toUpperCase()]) + ' ');
+      parsed.suburb = XRegExp.replace(
+        parsed.suburb,
+        XRegExp(
+          '^(?<dircode>' + this.addressRegex.dircode + ')\\s+(?=\\S)',
+          'ix'
+        ),
+        (match: any) =>
+          this.capitalize(DirectionCode[match.dircode.toUpperCase()]) + ' '
+      );
     }
 
     Object.keys(parsed).forEach(function (key) {
-      if (typeof parsed[key] !== "undefined") parsed[key] = parsed[key].trim();
-    })
+      if (typeof parsed[key] !== 'undefined') parsed[key] = parsed[key].trim();
+    });
 
     return parsed;
   }

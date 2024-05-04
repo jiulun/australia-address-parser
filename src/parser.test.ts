@@ -4,10 +4,20 @@ import { Parser } from './parser';
 test('parseLocation', () => {
 
   const expectedTestResultsByAddress = {
-    '1 Darling Island Road, Pyrmont NSW 2009': {
+    '8/1 Bon Scott Crescent, Moncrieff, ACT 2914': {
+      unitType: 'unit',
+      unitNumber: '8',
+      streetNumber: '1',
+      streetName: 'Bon Scott',
+      streetType: 'CRS',
+      suburb: 'Moncrieff',
+      state: 'ACT',
+      postcode: '2914'
+    },
+    '1 Darling Island Rd, Pyrmont NSW 2009': {
       streetNumber: '1',
       streetName: 'Darling Island',
-      streetType: 'RD',
+      streetType: 'Rd',
       suburb: 'Pyrmont',
       state: 'NSW',
       postcode: '2009'
@@ -21,8 +31,7 @@ test('parseLocation', () => {
       postcode: '5074'
     },
     '13A Burlina court, Elizabeth Hills NSW 2171': {
-      unitType: 'unit',
-      unitNumber: '13A',
+      streetNumber: '13A',
       streetName: 'Burlina',
       streetType: 'court',
       suburb: 'Elizabeth Hills',
